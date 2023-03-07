@@ -113,8 +113,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.11827415613169057 -0.07337410072493007 -0.9902663608010445 4.735329236400243
-  position -52.63757347788425 -134.31065705023641 34.00125116048616
+  orientation 0.32304760067995086 -0.7982008664881521 -0.5084443179272338 5.1024085217137625
+  position -139.67333645535874 6.822590921849638 104.14939596157951
   near 1
   follow "vehicle"
   bloomThreshold -1
@@ -557,10 +557,11 @@ CurvedRoadSegment {
   leftBorder FALSE
   curvatureRadius 40.5
 }
-BmwX5 {
-  translation -45 45.88 0.4
-  rotation 0 0 1 3.14159
-  controller "autonomous_vehicle"
+DEF car BmwX5 {
+  translation -48.1024 44.2733 0.0443397
+  rotation -0.00213576049664043 -0.011873002760896274 0.9999272325187172 3.12813
+  controller "mpc_controller"
+  supervisor TRUE
   frontSpotLights TRUE
   sensorsSlotTop [
     Camera {
