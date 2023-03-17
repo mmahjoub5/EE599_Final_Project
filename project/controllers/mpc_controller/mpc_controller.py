@@ -18,23 +18,16 @@
 import math
 from vehicle import Driver
 from controller import *
+from DynamicsController import CarDynamics
 
-supervisorNode = Supervisor()
-driver = Driver()
-driver.setSteeringAngle(0.2)
-driver.setCruisingSpeed(20)
-x= driver.step()
-print(x)
-print("we arre here")
-i = 0
-while supervisorNode.step(1000) != -1:
+driver = CarDynamics(0.1)
+
+while True:
+    omega = math.pi/4
+    w = driver.step(omega)
+    if (w == -1):
+        break
     #print("not zero")
-    car_node = supervisorNode.getFromDef('car')
-    translation_field = car_node.getField('translation')
-    print(car_node.getPosition())
-    angle = 0.3 * math.cos(driver.getTime())
-    driver.setSteeringAngle(angle)
-    if i %20 == 0:
-        new_value = [2.5, 0, 0]
-        translation_field.setSFVec3f(new_value)
-    i +=1 
+    # print(car_node.getPosition())
+    driver.printPosition()
+   
