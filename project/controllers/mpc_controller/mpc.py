@@ -4,6 +4,7 @@ import cvxpy as cp
 from scipy.linalg import block_diag
 from scipy.optimize import NonlinearConstraint, LinearConstraint, minimize, Bounds
 from math import factorial
+from gekko import GEKKO
 
 def imageSubplot(data:list, title:list, showFig:bool=True):
         plt.figure()
@@ -13,6 +14,7 @@ def imageSubplot(data:list, title:list, showFig:bool=True):
             plt.plot(data[i])
         if showFig:
             plt.show()
+        
 
 class MPC(object):
     def __init__(self, speed, H, pos, dt, goalX, goalY) -> None:
@@ -35,6 +37,8 @@ class MPC(object):
         self.c = self.constraints()
         self.N = self.X0.shape[0]
         self.Window = int((self.N-3)/4)
+        self.m  = GEKKO()
+        self.m.time = np.linspace(0,20,41)
 
     def setBounds(self):
         pass
