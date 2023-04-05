@@ -2,6 +2,8 @@ from gekko import GEKKO
 import numpy as np
 import matplotlib.pyplot as plt  
 from math import factorial, pi
+import math
+import pdb
 m = GEKKO()
 m.time = np.linspace(0,20,41)
 
@@ -9,81 +11,103 @@ m.time = np.linspace(0,20,41)
 mass = 500
 b = m.Param(value=50)
 K = m.Param(value=0.8)
-H = 100
+H = 4
 time_steps = H
-number_of_states =  3 * (H+1)
-number_of_controls = H
+number_of_states =  3 * (H)
+number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-dt = 0.5
-goalX, goalY = 0,0
-# Manipulated variable
-# p = m.MV(value=0, lb=0, ub=100)
-p = m.Array(m.MV,(num_decisions), value=0)
-N = num_decisions
-Window = int((N-3)/4)
+x_intial, y_initial, theta_intial = -4, -4, 0
 
-for i in range(len(p)):
-    p[i].STATUS = 1  # allow optimizer to change
-    p[i].DCOST = 0.1 # smooth out gas pedal movement
-    p[i].DMAX = 20   # slow down change of gas pedal
-    p[i].value = 0
-p[0].value = -4
-p[H+1].value = -4
-p[2*(H+1)].value  = 0
+dt = 0.05
+goalX, goalY = -2,-1
+traj = [[],[],[]]
+def nextStep(control,V, x,y,theta):
+    x_new = x + 0.05 * V * math.cos(theta)
+    y_new = y + 0.05 * V * math.sin(theta)
+    theta_new = theta + 0.05 * control
+    return x_new, y_new, theta_new
 
-# Controlled Variable
-# v = m.CV(value=0)
-v = m.Array(m.CV,(H),lb= -pi,ub=pi )
+def stopCriteria(x,y,theta):
+    if (x - goalX) ** 2 + (y - goalY) ** 2 < 0.1:
+        return True
+    else:
+        return False
+while True:
 
-
-for i in range(len(v)):
-    v[i].STATUS = 1  # add the SP to the objective
-    # v[i].SP = 40     # set point
-    # v[i].TR_INIT = 1 # set point trajectory
-    # v[i].TAU = 5     # time constant of trajectory
     
-x_init = m.Param(-4)
-y_init = m.Param(-4)
-theta_init = m.Param(0)
-dt = m.Param(0.5)
-V = m.Param(1)
-#m.options.CV_TYPE = 2 # squared error
-# Process model
-cos = lambda x: 1 - (x**2)/2 
-sin = lambda x: x - (x**3) / factorial(3)
-eq = []
-for i in range(H):
-    print(p[i+1])
-    eq.append(p[i+1]  == (p[i].value - dt * V * np.cos(p[2*(Window+1) + i].value)) )
-    eq.append(p[(Window +1) + i + 1] == (p[Window + 1 + i].value - dt * V * np.sin(p[2*(Window+1) + i].value)))
-    eq.append((p[2*(Window +1) + i + 1] == (p[2*(Window +1) + i].value - dt * p[3*(Window+1) + i].value)))
+    traj[0].append(x_intial)
+    traj[1].append(y_initial)
+    traj[2].append(theta_intial)
 
-m.Equation(eq)
-m.Equation(p[0] == 0)  
-m.Equation(p[Window+1] == y_init)
-m.Equation(p[2*Window+3] == theta_init * dt)
+    # Manipulated variable
+    p = m.Array(m.MV,(num_decisions), value=0)
+    N = num_decisions
+    Window = int((N-3)/4)
 
-m.options.IMODE = 6 # control
-m.Minimize(m.sum((p[:H] - goalX) ** 2   + (p[H+1:2*H +1] - goalY) ** 2))
-m.solve(disp=True)
+    for i in range(len(p)):
+        p[i].STATUS = 1  # allow optimizer to change
+        p[i].value = 0
+        if i < number_of_states - (H):
+            p[i].lower = -100
+            p[i].upper = 100
+        else:
+            p[i].lower = -pi/2
+            p[i].upper = pi/2
+    
+  
+    p[0].value = x_intial
+    p[H].value = y_initial
+    p[2*(H)].value  = theta_intial 
 
-# # get additional solution information
-# import json
-# with open(m.path+'//results.json') as f:
-#     results = json.load(f)
+    print(p)
+    
+    x_init = m.Param(x_intial)
+    y_init = m.Param(y_initial)
+    theta_init = m.Param(theta_intial)
+    dt = m.Const(0.05)
+    V = m.Const(1)
+    
+    eq = []
+    #pdb.set_trace()
+    #state constraints
 
-print(type(v[0]))
-for i in range(H):
+    for i in range(H - 1):
+        ##pdb.set_trace()
+        eq.append(p[i+1]  == p[i] + dt * V * m.cos(p[2*(H) + i]) )
+        eq.append(p[(H) + i + 1] == (p[H + i] + dt * V * m.sin((p[2*(H) + i]))))
+        eq.append((p[2*(H) + i + 1] == (p[2*(H) + i] + dt * p[3*(H) + i])))
+        
+    
+     #intial conditions
+    ##pdb.set_trace()
+    eq.append(p[0] == x_init)
+    eq.append( p[H] == y_init)
+    eq.append(p[2*(H)] == theta_init)
+    m.Equation(eq)
+   
+    
+    #pdb.set_trace()
+    q_f = 1
+    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
+    x = m.solve(disp=False) # solve
+    ###pdb.set_trace()
+    print(p[number_of_states].value[0])
+    print(p)
     print()
+    print()
+    print(p[number_of_states:])
+    x_intial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_intial, y_initial, theta_intial)
+    print(x_intial, y_initial, theta_intial, )
+    ###pdb.set_trace()
+    
+    # stop loop from keyboard input 
+    
     # plt.figure()
-    # plt.subplot(2,1,1)
-    # plt.plot(m.time,p[i].value,'b-',label='MV Optimized')
-    # plt.legend()
-    # plt.ylabel('Input')
-    # plt.subplot(2,1,2)
-    # plt.plot(m.time,results['v1.tr'],'k-',label='Reference Trajectory')
-    # plt.plot(m.time,v[i].value,'r--',label='CV Response')
-    # plt.ylabel('Output')
-    # plt.xlabel('Time')
-    # plt.legend(loc='best')
+    # print(traj)
+    # plt.plot(traj[0], traj[1], 'ro')
     # plt.show()
+    m = GEKKO()
+# get additional solution information
+import json
+with open(m.path+'//results.json') as f:
+    results = json.load(f)
