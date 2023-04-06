@@ -5,15 +5,15 @@ from math import pi
 import math
 import pdb
 m = GEKKO(remote=False)
-H = 4
+H = 10
 time_steps = H
 number_of_states =  3 * (H)
 number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-x_initial, y_initial, theta_intial = -4, -4, 0
+x_initial, y_initial, theta_intial =  44.2733, -48.1024, 0
 
 dt = 0.05
-goalX, goalY = -1,-2
+goalX, goalY = -6.59, -105.6,
 traj = [[],[],[]]
 
 def nextStep(control,V, x,y,theta):
@@ -44,8 +44,8 @@ while True:
         p[i].STATUS = 1  # allow optimizer to change
         p[i].value = 0
         if i < number_of_states - (H):
-            p[i].lower = -100
-            p[i].upper = 100
+            p[i].lower = -5000
+            p[i].upper = 5000
         else:
             p[i].lower = -pi/2
             p[i].upper = pi/2
@@ -59,7 +59,7 @@ while True:
     y_init = m.Param(y_initial)
     theta_init = m.Param(theta_intial)
     dt = m.Const(0.05)
-    V = m.Const(1)
+    V = m.Const(100)
     
     eq = []
     #pdb.set_trace()
@@ -83,13 +83,13 @@ while True:
     #pdb.set_trace()
     q_f = 1
     m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
-    x = m.solve(disp=False) # solve
+    x = m.solve(disp=True) # solve
     ###pdb.set_trace()
     # print(p[number_of_states].value[0])
     # print(p)
     # print(p[number_of_states:])
 
-    x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_initial, y_initial, theta_intial)
+    x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 100, x_initial, y_initial, theta_intial)
     print(x_initial, y_initial, theta_intial, )
     ###pdb.set_trace()
     
