@@ -1,44 +1,40 @@
 from vehicle import Driver
 import math
-from abc import ABC, abstractmethod
+from gekko_mpc import MPC
 import numpy as np
-class DynamicsManager(ABC):
-    @abstractmethod
-    def dynamics():
-        pass
-    @abstractmethod
-    def step():
-        pass
+
 
 
 '''
-I inherited the Driver class to perform the dynamics of our car
+I inherited the Driver class to perform the dynamics of our car, this our bridge between our optimal controlle and weBots
 
 '''
 class CarDynamics(Driver):
-    def __init__(self, v) -> None:
+    def __init__(self, V, dt, x_intial, y_initial, theta_initial, goalX, goalY) -> None:
         super().__init__()
         self.car_node = super(CarDynamics,self).getFromDef('car')
         self.translationField = self.car_node.getField('translation')
-        self.V = v
-        self.omega = None
-        self.dt = 0.05
-    def dynamics(self, x, y, theta):
-        x_new =  x + self.V * (self.dt * math.sin(theta))
-        y_new = y + self.V * (self.dt * math.cos(theta))
-        theta_new = self.dt * theta
+        self.V = V
+        self.dt = dt
+
+        self.x = x_intial
+        self.y = y_initial
+        self.theta = theta_initial
+        self.translationField.setSFVec3f([x_intial, y_initial, 0.0443397])
+        self.mpc = MPC(H=4, goalX= goalX, goalY = goalY)
+
+    def dynamics(self, x, y, theta, control):
+        x_new =  x + self.V * self.dt * (self.dt * math.cos(theta))
+        y_new = y + self.V * self.dt *  (self.dt * math.sin(theta))
+        theta_new =  theta + self.dt * control
         return x_new, y_new, theta_new
     
-    def mpc():
-        pass
-    
     def step(self, theta):
-        position = self.car_node.getPosition()
-        x = position[0]
-        y = position[1]
-        print("x", x, "y" , y, "theta", theta)
-        x_new, y_new, theta_new = self.dynamics(x, y, theta)
-        self.translationField.setSFVec3f([x_new, y_new, 0.1])
+        print("x", self.x, "y" , self.y, "theta", self.theta)
+        control = self.mpc.run(self.x, self.y, self.theta)
+        print(control)
+        self.x, self.y, self.theta = self.dynamics(self.x, self.y, self.theta, control)
+        self.translationField.setSFVec3f([self.x, self.y, 0.0443397])
         return super(CarDynamics,self).step()
         
     def printPosition(self):
