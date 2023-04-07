@@ -20,7 +20,7 @@ from vehicle import Driver
 from controller import *
 from DynamicsController import CarDynamics
 
-driver = CarDynamics(V=100, dt=0.05, x_intial=-48.1024, y_initial=44.2733, theta_initial=0, goalX=-2, goalY=-1)
+driver = CarDynamics(V=100, dt=0.05, x_intial=-48.1024, y_initial=44.2733, theta_initial=0, goalX=-105.6, goalY=-6.59)
 
 while True:
     omega = math.pi/4
