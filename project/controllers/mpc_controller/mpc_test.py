@@ -10,16 +10,16 @@ time_steps = H
 number_of_states =  3 * (H)
 number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-x_initial, y_initial, theta_intial =  44.2733, -48.1024, 0
+x_initial, y_initial, theta_intial =  -1, -1, 0
 
-dt = 0.05
-goalX, goalY = -6.59, -105.6,
+# dt = 0.05
+goalX, goalY = -5, 0
 traj = [[],[],[]]
 
 def nextStep(control,V, x,y,theta):
-    x_new = x + 0.05 * V * math.cos(theta)
-    y_new = y + 0.05 * V * math.sin(theta)
-    theta_new = theta + 0.05 * control
+    x_new = x + 0.001 * V * math.cos(theta)
+    y_new = y + 0.001 * V * math.sin(theta)
+    theta_new = theta + 0.001 * control
     return x_new, y_new, theta_new
 
 def stopCriteria(x,y):
@@ -44,11 +44,11 @@ while True:
         p[i].STATUS = 1  # allow optimizer to change
         p[i].value = 0
         if i < number_of_states - (H):
-            p[i].lower = -5000
-            p[i].upper = 5000
+            p[i].lower = -400
+            p[i].upper = 400
         else:
-            p[i].lower = -pi/2
-            p[i].upper = pi/2
+            p[i].lower = -2*pi
+            p[i].upper = 2*pi
     
   
     p[0].value = x_initial
@@ -58,8 +58,8 @@ while True:
     x_init = m.Param(x_initial)
     y_init = m.Param(y_initial)
     theta_init = m.Param(theta_intial)
-    dt = m.Const(0.05)
-    V = m.Const(100)
+    dt = m.Const(0.001)
+    V = m.Const(10)
     
     eq = []
     #pdb.set_trace()
@@ -81,16 +81,18 @@ while True:
    
     
     #pdb.set_trace()
-    q_f = 1
-    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
-    x = m.solve(disp=True) # solve
-    ###pdb.set_trace()
-    # print(p[number_of_states].value[0])
-    # print(p)
-    # print(p[number_of_states:])
+    q_f = 3
+    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2) + q_f * (p[H] - goalY) + q_f * (p[2*H] - goalY))
+    try:
+        m.solve(disp=True) # solve
+        x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 100, x_initial, y_initial, theta_intial)
+        print(x_initial, y_initial, theta_intial, )
+    except:
+        print("error")
+        break
+  
 
-    x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 100, x_initial, y_initial, theta_intial)
-    print(x_initial, y_initial, theta_intial, )
+    
     ###pdb.set_trace()
     
     # stop loop from keyboard input 
