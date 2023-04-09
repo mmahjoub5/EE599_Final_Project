@@ -16,10 +16,10 @@ time_steps = H
 number_of_states =  3 * (H)
 number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-x_intial, y_initial, theta_intial = -4, -4, 0
+x_intial, y_initial, theta_intial = -1, 1, 0
 
 dt = 0.05
-goalX, goalY = -2,-1
+goalX, goalY = 1,-1
 traj = [[],[],[]]
 def nextStep(control,V, x,y,theta):
     x_new = x + 0.05 * V * math.cos(theta)
@@ -27,14 +27,16 @@ def nextStep(control,V, x,y,theta):
     theta_new = theta + 0.05 * control
     return x_new, y_new, theta_new
 
-def stopCriteria(x,y,theta):
-    if (x - goalX) ** 2 + (y - goalY) ** 2 < 0.1:
+def stopCriteria(x,y):
+    if np.abs(x - goalX) < 0.05 and np.abs(y - goalY) < 0.05:
         return True
     else:
         return False
 while True:
 
-    
+    if (stopCriteria(x_intial,y_initial)):
+        break
+
     traj[0].append(x_intial)
     traj[1].append(y_initial)
     traj[2].append(theta_intial)
@@ -51,8 +53,8 @@ while True:
             p[i].lower = -100
             p[i].upper = 100
         else:
-            p[i].lower = -pi/2
-            p[i].upper = pi/2
+            p[i].lower = -pi/4
+            p[i].upper = pi/4
     
   
     p[0].value = x_intial
@@ -86,27 +88,29 @@ while True:
     m.Equation(eq)
    
     
-    #pdb.set_trace()
-    q_f = 1
-    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
-    x = m.solve(disp=False) # solve
-    ###pdb.set_trace()
-    print(p[number_of_states].value[0])
-    print(p)
-    print()
-    print()
-    print(p[number_of_states:])
-    x_intial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_intial, y_initial, theta_intial)
-    print(x_intial, y_initial, theta_intial, )
-    ###pdb.set_trace()
-    
-    # stop loop from keyboard input 
-    
-    # plt.figure()
-    # print(traj)
-    # plt.plot(traj[0], traj[1], 'ro')
-    # plt.show()
+    try:
+        q_f = 1
+        m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
+        x = m.solve(disp=False) # solve
+        ###pdb.set_trace()
+        print(p[number_of_states].value[0])
+        print(p)
+        print()
+        print()
+        print(p[number_of_states:])
+        x_intial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_intial, y_initial, theta_intial)
+        print(x_intial, y_initial, theta_intial, )
+        ###pdb.set_trace()
+    except:
+        print("Error")
+        break
+
     m = GEKKO()
+
+plt.figure()
+plt.plot(traj[0], traj[1], 'ro')
+plt.show()
+
 # get additional solution information
 import json
 with open(m.path+'//results.json') as f:
