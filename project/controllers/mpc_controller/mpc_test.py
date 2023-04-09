@@ -10,16 +10,17 @@ time_steps = H
 number_of_states =  3 * (H)
 number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-x_initial, y_initial, theta_intial =  -1, -1, 0
-
+x_initial, y_initial, theta_intial =  -1, 1, 0
+dt_constant = 0.05
 # dt = 0.05
-goalX, goalY = -5, 0
+goalX, goalY = -3, 0
 traj = [[],[],[]]
 
 def nextStep(control,V, x,y,theta):
-    x_new = x + 0.001 * V * math.cos(theta)
-    y_new = y + 0.001 * V * math.sin(theta)
-    theta_new = theta + 0.001 * control
+    global dt_constant
+    x_new = x + dt_constant * V * math.cos(theta)
+    y_new = y + dt_constant * V * math.sin(theta)
+    theta_new = theta + dt_constant * control
     return x_new, y_new, theta_new
 
 def stopCriteria(x,y):
@@ -58,8 +59,8 @@ while True:
     x_init = m.Param(x_initial)
     y_init = m.Param(y_initial)
     theta_init = m.Param(theta_intial)
-    dt = m.Const(0.001)
-    V = m.Const(10)
+    dt = m.Const(0.05)
+    V = m.Const(1)
     
     eq = []
     #pdb.set_trace()
@@ -82,10 +83,10 @@ while True:
     
     #pdb.set_trace()
     q_f = 3
-    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2) + q_f * (p[H] - goalY) + q_f * (p[2*H] - goalY))
+    m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
     try:
         m.solve(disp=True) # solve
-        x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 100, x_initial, y_initial, theta_intial)
+        x_initial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_initial, y_initial, theta_intial)
         print(x_initial, y_initial, theta_intial, )
     except:
         print("error")
