@@ -4,22 +4,22 @@ import matplotlib.pyplot as plt
 from math import factorial, pi
 import math
 import pdb
-m = GEKKO()
+m = GEKKO(remote=False)
 m.time = np.linspace(0,20,41)
 
 # Parameters
 mass = 500
 b = m.Param(value=50)
 K = m.Param(value=0.8)
-H = 4
+H = 50
 time_steps = H
 number_of_states =  3 * (H)
 number_of_controls = H - 1
 num_decisions = number_of_states + number_of_controls
-x_intial, y_initial, theta_intial = -1, 1, 0
+x_intial, y_initial, theta_intial = -4, 4, 0
 
 dt = 0.05
-goalX, goalY = 1,-1
+goalX, goalY = -10,0
 traj = [[],[],[]]
 def nextStep(control,V, x,y,theta):
     x_new = x + 0.05 * V * math.cos(theta)
@@ -61,7 +61,7 @@ while True:
     p[H].value = y_initial
     p[2*(H)].value  = theta_intial 
 
-    print(p)
+    
     
     x_init = m.Param(x_intial)
     y_init = m.Param(y_initial)
@@ -93,12 +93,13 @@ while True:
         m.Minimize(sum((p[0:H] - goalX) ** 2   + (p[H:2*H] - goalY) ** 2))
         x = m.solve(disp=False) # solve
         ###pdb.set_trace()
-        print(p[number_of_states].value[0])
-        print(p)
-        print()
-        print()
-        print(p[number_of_states:])
+        # print(p[number_of_states].value[0])
+        # print(p)
+        # print()
+        # print()
+       # print(p[3*H:])
         x_intial, y_initial, theta_intial = nextStep(p[3*H + 1].value[0], 1, x_intial, y_initial, theta_intial)
+        print(p[3*H + 2].value)
         print(x_intial, y_initial, theta_intial, )
         ###pdb.set_trace()
     except:
