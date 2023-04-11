@@ -25,14 +25,14 @@ while supervisor.step(time_step) != -1:
     objects = supervisor.getFromDef("OBJECTS").getField("children")
     
     # Reset the occupancy grid
-    occupancy_grid.fill(0)
+    occupancy_grid.fill(1)
     
     # Loop through all cells in the occupancy grid
     for y in range(GRID_SIZE):
         for x in range(GRID_SIZE):
             # Calculate the position of the cell in meters
             pos = (np.array([x, y]) - (GRID_SIZE // 2)) * CELL_SIZE + GRID_CENTER
-            
+       
             # Check if the position is inside the road
             if road.isInBoundingBox(pos):
                 occupancy_grid[y, x] = 1
