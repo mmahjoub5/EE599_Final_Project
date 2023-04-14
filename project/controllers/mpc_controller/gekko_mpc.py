@@ -13,14 +13,15 @@ class MPC(object):
         self.dt = 0.05
         self.V = 1
 
-        self.number_of_controls = H - 1
-        self.number_of_states =  3 * (H)
+        self.number_of_controls =  2* (H - 1)
+        self.number_of_states =  4 * (H)
         self.goalX, self.goalY = goalX, goalY
 
         self.num_decisions = self.number_of_states + self.number_of_controls
         self.traj = [[self.x_initial],[self.y_initial],[self.theta_intial]]
         
-    def run(self, x, y, theta):   
+    def run(self, x, y, theta, v):   
+        
         # update trajectory
         self.traj[0].append(x)
         self.traj[1].append(y)
@@ -31,9 +32,10 @@ class MPC(object):
         
 
         m = GEKKO(remote=False)
-        p = self.createVariables(m, x,y,theta)
-       
-        m.Equation(self.setConstraints(m, p, x, y, theta))
+        p = self.createVariables(m, x,y,theta, v)
+        print(p)
+        # pdb.set_trace()
+        m.Equation(self.setConstraints(m, p, x, y, theta, v))
         m.Minimize(sum((p[0:self.H] - self.goalX) ** 2   + (p[self.H:2*self.H] - self.goalY) ** 2))
         print("we are here")
         m.options.MAX_ITER = 1000
@@ -45,52 +47,55 @@ class MPC(object):
             print("error")
             self.plotTraj()
             return None
-        
-        return p[3*self.H + 1].value[0]
+        print(p[4 * self.H].value[0])
+        return p[3*self.H + 1].value[0], p[4 * self.H].value[0]
 
-    def createVariables(self, m:GEKKO, x,y, theta):
+    def createVariables(self, m:GEKKO, x,y, theta, v):
         p = m.Array(m.MV,(self.num_decisions), value=0)
         for i in range(len(p)):
             p[i].STATUS = 1  # allow optimizer to change
             p[i].value = 0
-            if i < self.number_of_states - (self.H):
+            if i <  2* self.H:
                 p[i].lower = -400
                 p[i].upper = 400
+            elif i < 4*self.H:
+                p[i].lower = -2*pi
+                p[i].upper = 2*pi
             else:
-                p[i].lower = - pi
-                p[i].upper = pi
+                p[i].lower = 0
+                p[i].upper = 100
 
         p[0].value = x
         p[self.H].value = y
         p[2*(self.H)].value  = theta
-        
+        p[4*(self.H) - 1].value = v
         return p
     
 
     # set up the constraints
-    def setConstraints(self, m:GEKKO, p:GEKKO.MV, x,y, theta) -> list:
+    def setConstraints(self, m:GEKKO, p:GEKKO.MV, x,y, v, theta) -> list:
         eq = []
         x_init = m.Param(x)
         y_init = m.Param(y)
         theta_init = m.Param(theta)
         dt = m.Const(self.dt)
-        V = m.Const(self.V)
-
+        # V = m.Const(self.V)
         #state constraints  
         for i in range(self.H - 1):
             ##pdb.set_trace()
-            eq.append(p[i+1]  == p[i] + dt * V * m.cos(p[2*(self.H) + i]) )
-            eq.append(p[(self.H) + i + 1] == (p[self.H + i] + dt * V * m.sin((p[2*(self.H) + i]))))
-            eq.append((p[2*(self.H) + i + 1] == (p[2*(self.H) + i] + dt * p[3*(self.H) + i])))
-            
+            eq.append(p[i+1]  == p[i] + dt * p[4*self.H - 1 + i] * m.cos(p[2*(self.H) + i]) )                           # x state constraints
+            eq.append(p[(self.H) + i + 1] == (p[self.H + i] + dt * p[4*self.H - 1 + i] * m.sin((p[2*(self.H) + i]))))   # y state constraints
+            eq.append((p[2*(self.H) + i + 1] == (p[2*(self.H) + i] + dt * p[3*(self.H) + i])))                          # theta state constraints
+            eq.append((p[4* self.H + i] == (p[4* self.H  - 1+ i] + dt * p[5* self.H - 1+ i])))                          # v state constraints
+        
         #intial conditions
-        ##pdb.set_trace()
+        #pdb.set_trace()
        
 
         eq.append(p[0] == x_init)
         eq.append( p[self.H] == y_init)
         eq.append(p[2*(self.H)] == theta_init)
-   
+        eq.append(p[4*(self.H) - 1] == 1)
         return eq
 
 
