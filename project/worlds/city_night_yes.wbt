@@ -10,7 +10,6 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/BuildingUnderConstruction.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/CommercialBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/UBuilding.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/HollowBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/Hotel.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/TheThreeTowers.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/buildings/protos/CyberboticsTower.proto"
@@ -114,7 +113,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation 0.32304760067995086 -0.7982008664881521 -0.5084443179272338 5.1024085217137625
-  position -139.67333645535874 6.822590921849638 104.14939596157951
+  position -366.0137373170593 -151.11780387342492 531.5365006625996
   near 1
   follow "vehicle"
   bloomThreshold -1
@@ -615,8 +614,6 @@ CommercialBuilding {
 }
 UBuilding {
   translation -87.1466 81.9927 0
-}
-HollowBuilding {
 }
 Hotel {
   translation -9.97953 71.6228 0

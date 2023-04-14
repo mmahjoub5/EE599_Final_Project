@@ -4,67 +4,78 @@ import matplotlib.pyplot as plt
 from math import pi
 import math
 import pdb
-# m = GEKKO()
-# Parameters
+
+
 class MPC(object):
-    def __init__(self, H:int, goalX, goalY) -> None:
+    def __init__(self, goalX , goalY, H:int, x_init, y_init, theta_init) -> None:
         self.H = H
-        self.x_initial, self.y_initial, self.theta_intial =  None, None, None
+        self.x_initial, self.y_initial, self.theta_intial =  x_init, y_init, theta_init
         self.dt = 0.05
-        self.V = 100
+        self.V = 1
 
         self.number_of_controls = H - 1
         self.number_of_states =  3 * (H)
-        self.goalX = goalX
-        self.goalY = goalY
+        self.goalX, self.goalY = goalX, goalY
 
         self.num_decisions = self.number_of_states + self.number_of_controls
-        self.traj = [[],[],[]]
+        self.traj = [[self.x_initial],[self.y_initial],[self.theta_intial]]
         
-    def run(self, x, y, theta):
-        # print("x", self.traj[0])
-        # print("y", self.traj[1])
-        # print("theta", self.traj[2])
-        # pdb.set_trace()
-        self.x_initial, self.y_initial, self.theta_intial = x, y, theta
-       
+    def run(self, x, y, theta):   
         # update trajectory
-        self.traj[0].append(self.x_initial)
-        self.traj[1].append(self.y_initial)
-        self.traj[2].append(self.theta_intial)
+        self.traj[0].append(x)
+        self.traj[1].append(y)
+        self.traj[2].append(theta)
+        if (self.stopCriteria(x,y)):
+            self.plotTraj()
+            return None
+        
 
         m = GEKKO(remote=False)
-        p = self.createVariables(m)
-        m.Equation(self.setConstraints(m, p))
+        p = self.createVariables(m, x,y,theta)
+       
+        m.Equation(self.setConstraints(m, p, x, y, theta))
         m.Minimize(sum((p[0:self.H] - self.goalX) ** 2   + (p[self.H:2*self.H] - self.goalY) ** 2))
-        m.solve(disp=False) # solve
+        print("we are here")
+        m.options.MAX_ITER = 1000
+
+
+        try:
+            m.solve(disp=False) # solve
+        except:
+            print("error")
+            self.plotTraj()
+            return None
         
         return p[3*self.H + 1].value[0]
 
-    def createVariables(self, m:GEKKO):
+    def createVariables(self, m:GEKKO, x,y, theta):
         p = m.Array(m.MV,(self.num_decisions), value=0)
         for i in range(len(p)):
             p[i].STATUS = 1  # allow optimizer to change
             p[i].value = 0
             if i < self.number_of_states - (self.H):
-                p[i].lower = -100
-                p[i].upper = 100
+                p[i].lower = -400
+                p[i].upper = 400
             else:
-                p[i].lower = -pi/2
-                p[i].upper = pi/2
+                p[i].lower = - pi
+                p[i].upper = pi
 
-        p[0].value = self.x_initial
-        p[self.H].value = self.y_initial
-        p[2*(self.H)].value  = self.theta_intial 
+        p[0].value = x
+        p[self.H].value = y
+        p[2*(self.H)].value  = theta
         
         return p
     
 
     # set up the constraints
-    def setConstraints(self, m:GEKKO, p:GEKKO.MV) -> list:
+    def setConstraints(self, m:GEKKO, p:GEKKO.MV, x,y, theta) -> list:
         eq = []
+        x_init = m.Param(x)
+        y_init = m.Param(y)
+        theta_init = m.Param(theta)
         dt = m.Const(self.dt)
         V = m.Const(self.V)
+
         #state constraints  
         for i in range(self.H - 1):
             ##pdb.set_trace()
@@ -74,13 +85,21 @@ class MPC(object):
             
         #intial conditions
         ##pdb.set_trace()
-        eq.append(p[0] == self.x_initial)
-        eq.append( p[self.H] == self.y_initial)
-        eq.append(p[2*(self.H)] == self.theta_intial)
+       
+
+        eq.append(p[0] == x_init)
+        eq.append( p[self.H] == y_init)
+        eq.append(p[2*(self.H)] == theta_init)
    
         return eq
 
 
+    def stopCriteria(self, x,y):
+        if np.abs(x - self.goalX) < 0.4 and np.abs(y - self.goalY) < 0.4:
+            return True
+        else:
+            return False
+        
     def plotTraj(self):
         plt.figure()
         plt.plot(self.traj[0], self.traj[1])

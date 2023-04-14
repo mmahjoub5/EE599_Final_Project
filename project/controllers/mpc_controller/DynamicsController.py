@@ -21,20 +21,25 @@ class CarDynamics(Driver):
         self.y = y_initial
         self.theta = theta_initial
         self.translationField.setSFVec3f([x_intial, y_initial, 0.0443397])
-        self.mpc = MPC(H=4, goalX= goalX, goalY = goalY)
+        self.mpc = MPC(10, goalX=goalX, goalY= goalY, x_init=x_intial, y_init= y_initial, theta_init= 0)
+        self.mpc.dt = dt
+        self.mpc.V = V
 
-    def dynamics(self, x, y, theta, control):
-        x_new =  x + self.V * self.dt * (self.dt * math.cos(theta))
-        y_new = y + self.V * self.dt *  (self.dt * math.sin(theta))
-        theta_new =  theta + self.dt * control
+    def dynamics(self, mpc:MPC, x, y, theta, control):
+        x_new =  x + mpc.V * mpc.dt * (mpc.dt * math.cos(theta))
+        y_new = y + mpc.V * mpc.dt *  (mpc.dt * math.sin(theta))
+        theta_new =  theta + mpc.dt * control
         return x_new, y_new, theta_new
     
     def step(self, theta):
-        print("x", self.x, "y" , self.y, "theta", self.theta)
+        
         control = self.mpc.run(self.x, self.y, self.theta)
         print(control)
-        self.x, self.y, self.theta = self.dynamics(self.x, self.y, self.theta, control)
+        self.x, self.y, self.theta = self.dynamics(self.mpc, self.x, self.y, self.theta, control)
         self.translationField.setSFVec3f([self.x, self.y, 0.0443397])
+        #change angle of car using quadcord rotation
+        
+        self.car_node.getField('rotation').setSFRotation([theta,-0.00213565,-0.0118727,0.999905])
         return super(CarDynamics,self).step()
         
     def printPosition(self):

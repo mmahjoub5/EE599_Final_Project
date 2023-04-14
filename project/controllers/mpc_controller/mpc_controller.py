@@ -19,15 +19,17 @@ import math
 from vehicle import Driver
 from controller import *
 from DynamicsController import CarDynamics
+from utils.GetNodes import getNodes
 
-driver = CarDynamics(V=100, dt=0.05, x_intial=-48.1024, y_initial=44.2733, theta_initial=0, goalX=-105.6, goalY=-6.59)
+driver = CarDynamics(V=1, dt=0.05, x_intial=-1, y_initial=1, theta_initial=0, goalX=-2, goalY=2)
 
-while True:
-    omega = math.pi/4
-    w = driver.step(omega)
-    if (w == -1):
-        break
-    #print("not zero")
-    # print(car_node.getPosition())
-    driver.printPosition()
+# while True:
+#     omega = math.pi/4
+#     w = driver.step(omega)
+#     if (w == -1):
+#         break
+#     #print("not zero")
+#     # print(car_node.getPosition())
+#     driver.printPosition()
    
+getNodes()
