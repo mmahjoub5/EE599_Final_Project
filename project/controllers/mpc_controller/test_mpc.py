@@ -9,8 +9,8 @@ def dynamics(mpc:MPC, x, y, v, theta, control_u, control_v):
     v_new = v + mpc.dt * control_v
     return x_new, y_new, theta_new, v_new
 
-x_new = -40
-y_new = -50
+x_new = 3
+y_new = 3
 theta_new = 0 
 H =3
 mpc = MPC(H=H, goalX=0, goalY=0, x_init=x_new, y_init= y_new, theta_init= theta_new)

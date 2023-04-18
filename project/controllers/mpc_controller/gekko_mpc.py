@@ -62,8 +62,8 @@ class MPC(object):
                 p[i].lower = -2*pi
                 p[i].upper = 2*pi
             else:
-                p[i].lower = 0
-                p[i].upper = 100
+                p[i].lower = -5
+                p[i].upper = -5
 
         p[0].value = x
         p[self.H].value = y
@@ -71,7 +71,14 @@ class MPC(object):
         p[4*(self.H) - 1].value = v
         return p
     
-
+    '''
+    
+        x_t_1 = x_t + dt * v_t * cos(theta)   
+        y_t_1 = y_t + v_t * dt * sin(theta)
+        theta_t_1  = theta_t + dt * omega
+        v_t_1 = v_t * dt * a
+        [x, y, theta, v, omega, a]
+    '''
     # set up the constraints
     def setConstraints(self, m:GEKKO, p:GEKKO.MV, x,y, v, theta) -> list:
         eq = []
@@ -86,16 +93,17 @@ class MPC(object):
             eq.append(p[i+1]  == p[i] + dt * p[4*self.H - 1 + i] * m.cos(p[2*(self.H) + i]) )                           # x state constraints
             eq.append(p[(self.H) + i + 1] == (p[self.H + i] + dt * p[4*self.H - 1 + i] * m.sin((p[2*(self.H) + i]))))   # y state constraints
             eq.append((p[2*(self.H) + i + 1] == (p[2*(self.H) + i] + dt * p[3*(self.H) + i])))                          # theta state constraints
-            eq.append((p[4* self.H + i] == (p[4* self.H  - 1+ i] + dt * p[5* self.H - 1+ i])))                          # v state constraints
+            eq.append((p[4* self.H + i] == p[4* self.H -1+ i] + dt * p[5* self.H - 1+ i]))                                                        # v state constraints
         
         #intial conditions
-        #pdb.set_trace()
+        # pdb.set_trace()
        
 
         eq.append(p[0] == x_init)
         eq.append( p[self.H] == y_init)
         eq.append(p[2*(self.H)] == theta_init)
         eq.append(p[4*(self.H) - 1] == 1)
+        print(eq)
         return eq
 
 

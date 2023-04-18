@@ -4,7 +4,7 @@ params = get_params();
 
 
 %%
-xinit = [4.5;4.5;0;1];
+xinit = [2.5;1;0;1];
 traj = [xinit];
 % y = RMPC(10, 100000,xinit);
 
@@ -52,7 +52,7 @@ xline(1)
 xline(5)
 yline(1)
 yline(5)
-xline(-1)
+xline(-1, 'Color',)
 xline(-5)
 yline(-1)
 yline(-5)

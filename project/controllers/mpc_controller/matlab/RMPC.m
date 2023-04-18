@@ -3,8 +3,8 @@
 function y = RMPC(H, numberOfRandomSamples, xinit)
     pos = [xinit;0;0];
     dt = 0.01;
-    goalX = -2; 
-    goalY = 2;
+    goalX = 2.9; 
+    goalY = 2.9;
     numberOfStates = 4;
     numberOfControls = 2;
     posMatrix = zeros(6, H+1, numberOfRandomSamples);

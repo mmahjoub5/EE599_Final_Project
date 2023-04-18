@@ -1,8 +1,9 @@
 function y = betweenPaths(posMatrix,sampleIndex, H)
+    % to do make this dynamic to work with different size loops
     for i = 1:H
         if (posMatrix(1,i, sampleIndex) == 0)
-            if ~((posMatrix(2,i, sampleIndex) > -5 && posMatrix(2,i,sampleIndex) < -1) || ...
-                    (posMatrix(2,i, sampleIndex) < 5 && posMatrix(2,i,sampleIndex) > 1))
+            if ~((posMatrix(2,i, sampleIndex) > -3 && posMatrix(2,i,sampleIndex) < -1) || ...
+                    (posMatrix(2,i, sampleIndex) < 3 && posMatrix(2,i,sampleIndex) > 1))
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -10,8 +11,8 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
             end
         end
         if (posMatrix(2,i, sampleIndex) == 0)
-            if ~((posMatrix(1,i, sampleIndex) < 5 && posMatrix(1,i,sampleIndex) > 1) || ...
-                    (posMatrix(1,i, sampleIndex) > -5 && posMatrix(1,i,sampleIndex) < -1))
+            if ~((posMatrix(1,i, sampleIndex) < 3 && posMatrix(1,i,sampleIndex) > 1) || ...
+                    (posMatrix(1,i, sampleIndex) > -3 && posMatrix(1,i,sampleIndex) < -1))
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -30,7 +31,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
 
         %top left corner (left side)
         if (posMatrix(1,i, sampleIndex) <= -1 && posMatrix(1,i, sampleIndex) <= 1)
-            if ~(posMatrix(1,i, sampleIndex) > -5 && posMatrix(1,i,sampleIndex) < -1)
+            if ~(posMatrix(1,i, sampleIndex) > -3 && posMatrix(1,i,sampleIndex) < -1)
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -39,7 +40,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
         end
 %         % top left corner (top side)
         if (posMatrix(1,i, sampleIndex) < -1 && posMatrix(2,i, sampleIndex) > 1)
-            if ~(posMatrix(2,i, sampleIndex) > 1 && posMatrix(2,i,sampleIndex) < 5)
+            if ~(posMatrix(2,i, sampleIndex) > 1 && posMatrix(2,i,sampleIndex) < 3)
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -49,7 +50,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
 % 
 %         % bottom left corner (left side)
         if(posMatrix(1,i,sampleIndex)  < - 1 && posMatrix(2,i, sampleIndex) > -1)
-            if ~(posMatrix(1,i, sampleIndex) > -5 && posMatrix(1,i,sampleIndex) < -1)
+            if ~(posMatrix(1,i, sampleIndex) > -3 && posMatrix(1,i,sampleIndex) < -1)
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -59,7 +60,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
 
         % bottom left corner (bottom side)
         if (posMatrix(1,i, sampleIndex) > -1 && posMatrix(2,i, sampleIndex) < -1.1)
-            if ~(posMatrix(2,i, sampleIndex) > -5 && posMatrix(2,i,sampleIndex) < -1)
+            if ~(posMatrix(2,i, sampleIndex) > -3 && posMatrix(2,i,sampleIndex) < -1)
                    posMatrix(1,i, sampleIndex)
                 posMatrix(2,i, sampleIndex)
                 y = false;
@@ -69,7 +70,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
         
 %         % bottom right corner (right side)
         if (posMatrix(1, i, sampleIndex) >= 1 && posMatrix(2, i, sampleIndex) <= 1)
-            if ~(posMatrix(1,i, sampleIndex) > 1 && posMatrix(1,i,sampleIndex) < 5)
+            if ~(posMatrix(1,i, sampleIndex) > 1 && posMatrix(1,i,sampleIndex) < 3)
                    %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -79,7 +80,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
 
         %bottom right cornet (bottom side)
         if (posMatrix(1, i, sampleIndex) > -1 && posMatrix(1, i, sampleIndex) < 1 && posMatrix(2,i,sampleIndex) < -1)
-            if ~(posMatrix(2,i, sampleIndex) > -5 && posMatrix(2,i,sampleIndex) < -1)
+            if ~(posMatrix(2,i, sampleIndex) > -3 && posMatrix(2,i,sampleIndex) < -1)
                 %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                 y = false;
@@ -89,7 +90,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
 
         % top right corner (right side)
         if ((1 <= posMatrix(1,i, sampleIndex) && posMatrix(2,i, sampleIndex) < 1))
-            if ~(posMatrix(1,i, sampleIndex) >= 1 && posMatrix(1,i,sampleIndex) < 5)
+            if ~(posMatrix(1,i, sampleIndex) >= 1 && posMatrix(1,i,sampleIndex) < 3)
 %                    posMatrix(1,i, sampleIndex)
 %                 posMatrix(2,i, sampleIndex)
                 y = false;
@@ -99,7 +100,7 @@ function y = betweenPaths(posMatrix,sampleIndex, H)
          
          % top right cornet (top Side)
         if ((posMatrix(2,i, sampleIndex) > 1 ) && posMatrix(1, i, sampleIndex) > 1)
-           if ~(posMatrix(2,i, sampleIndex) < 5 && posMatrix(2,i,sampleIndex) >= 1)
+           if ~(posMatrix(2,i, sampleIndex) < 3 && posMatrix(2,i,sampleIndex) >= 1)
                   %posMatrix(1,i, sampleIndex)
                 %posMatrix(2,i, sampleIndex)
                y = false;

@@ -4,7 +4,7 @@ params = get_params();
 
 
 %%
-xinit = [2;4.5;0;1];
+xinit = [-2.5;-1;0;1];
 traj = [xinit];
 % y = RMPC(10, 100000,xinit);
 
@@ -23,6 +23,7 @@ while true
         break
     end
 end
+
 
 
 %%
