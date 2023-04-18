@@ -15,28 +15,32 @@ height2 = params.obsheight2;
 %% TODO
 % Define the grid for the computation: g
 % g =...
-grid_min = [-10; -10; -10]; % Lower corner of computation domain
-grid_max = [10; 10; 10];    % Upper corner of computation domain
-N = [75; 75; 75];         % Number of grid points per dimension
+
+%add 4th dimension for these 
+grid_min = [-110; -110; -110; -110]; % Lower corner of computation domain
+grid_max = [110; 110; 110; 110];    % Upper corner of computation domain
+N = [50; 50; 50; 50];         % Number of grid points per dimension
 g = createGrid(grid_min, grid_max, N);
 
-
-grid_min1 = [-1; -1]; % Lower corner of computation domain
-grid_max1 = [1; 1];    % Upper corner of computation domain
-N1 = [10; 10];         % Number of grid points per dimension
-g1 = createGrid(grid_min1, grid_max1, N1);
 %% TODO
 % Define the failure set: data0
 % data0 = ....
 
+wMax = pi;
+rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -10], [45; 45; pi; 10]);%add velcoity dimension - neg max speed - + max speed
+rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -10], [20; 20; pi; 10]);
+rect3 = shapeDifference(rect1, rect2);
 
-test1 = shapeRectangleByCorners(g,[obsX1; obsY1; -pi], [obsX1 + width1; obsY1 + height1; pi]);
-test2 = shapeRectangleByCorners(g,[obsX2; obsY2; -pi], [obsX2 + width2; obsY2 + height2; pi]);
 
-% test1 = shapeRectangleByCorners(g,[ obsX1, obsY1, -wMax], [obsY1 + height1, obsX1 + width1, wMax]);
-% test2 = shapeRectangleByCorners(g,[obsY2,  obsX2, -wMax], [ obsY2 + height2, obsX2 + width2, wMax]);
-test3 = shapeRectangleByCorners(g1,[0,0], [.05,.05]);
-data0 = shapeUnion(test1,test2);
+rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-10], [105; 105; pi; 10]);
+rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -10], [80; 80; pi; 10]);
+rect6 = shapeDifference(rect4, rect5);
+
+
+data0 = shapeUnion(rect3, rect6);
+data0 = shapeComplement(data0);
+
+
 
 % time
 t0 = 0;
@@ -44,12 +48,15 @@ tMax = 2;
 dt = 0.05;
 tau = t0:dt:tMax;
 
+disp('choose max or min')
 % control trying to min or max value function?
 uMode = 'max';
 dMode = 'min';
 
 % Define dynamic system
-dCar = DubinsCar([0, 0, 0], wMax, speed, dMax);
+%dCar = DubinsCar([0, 0, 0], wMax, speed, dMax);
+% create plne 4d 
+dCar = Plane4D([0, 0, 0, 0], wMax, speed, dMax, 4);
 
 % Put grid and dynamic systems into schemeData
 schemeData.grid = g;
@@ -60,6 +67,7 @@ schemeData.dMode = dMode;
 % HJIextraArgs.obstacles = obs;
 
 %% Compute value function
+disp('compute value function')
 % HJIextraArgs.visualize = true; %show plot
 HJIextraArgs.visualize.valueSet = 1;
 HJIextraArgs.visualize.initialValueSet = 1;
@@ -67,14 +75,14 @@ HJIextraArgs.visualize.figNum = 1; %set figure number
 HJIextraArgs.visualize.deleteLastPlot = false; %delete previous plot as you update
 
 % uncomment if you want to see a 2D slice
-HJIextraArgs.visualize.plotData.plotDims = [1 1 0]; %plot x, y
-HJIextraArgs.visualize.plotData.projpt = [0]; %project at theta = 0
+HJIextraArgs.visualize.plotData.plotDims = [1 1 0 0]; %plot x, y
+HJIextraArgs.visualize.plotData.projpt = {pi,'min'}; %project at theta = 0
 HJIextraArgs.visualize.viewAngle = [0,90]; % view 2D
 
 %[data, tau, extraOuts] = ...
 % HJIPDE_solve(data0, tau, schemeData, minWith, extraArgs)
 [data, tau2, ~] = ...
-  HJIPDE_solve(data0, tau, schemeData, 'zero', HJIextraArgs);
+    HJIPDE_solve(data0, tau, schemeData, 'zero', HJIextraArgs);
 derivatives = computeGradients(g, data(:,:,:,end));
 safety_controller =  dCar.optCtrl([], [], derivatives, 'max');
 worst_dist =  dCar.optDstb([], [], derivatives, 'min');
