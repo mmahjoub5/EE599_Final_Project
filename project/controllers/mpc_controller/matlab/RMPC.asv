@@ -1,0 +1,90 @@
+%% random sampled MPC
+
+function y = RMPC(H, numberOfRandomSamples, xinit)
+    pos = [xinit;0;0];
+    dt = 0.05;
+    numberOfStates = 4;
+    numberOfControls = 2;
+    posMatrix = zeros(6, H+1, numberOfRandomSamples);
+    for i = 1:numberOfRandomSamples
+        posMatrix(:, 1, i) = pos';
+    end
+    
+    w_bound = [-pi pi];
+    a_bound = [-10 10];
+    % rand number between interval (a,b) r = a + (b-a) *rand(Number of
+    % sampels,1)
+    
+    w_rand = w_bound(1) + (w_bound(2) - w_bound(1)) * rand(numberOfRandomSamples,1);
+    a_rand = a_bound(1) + (a_bound(2) - a_bound(1)) * rand(numberOfRandomSamples,1);
+
+    % calculate the next position 
+    for k = 1:H
+        for i = 1:numberOfRandomSamples
+            posMatrix(1, k+1, i) = posMatrix(1,k,i) + dt * posMatrix(4, k,i) * cos(posMatrix(3, k,i));
+            posMatrix(2, k+1, i) = posMatrix(2,k,i) + dt * posMatrix(4, k,i) * sin(posMatrix(3, k,i));
+            posMatrix(3,k+1,i) = posMatrix(3,k,i) + dt * w_rand(i);
+            posMatrix(4,k+1,i) = posMatrix(4, k, i) + dt * a_rand(i);
+            posMatrix(5,k+1,i) = w_rand(i);
+            posMatrix(6,k+1,i) = a_rand(i);
+        end
+    end
+    
+    validPaths = [];
+    for i = 1:numberOfRandomSamples
+        if (norm(posMatrix(1,:,i)) ^ 2 + norm(posMatrix(2,:,i))^2 <= 25 && norm(posMatrix(1,:,i)) ^ 2 + norm(posMatrix(2,:,i))^2 >= 1)
+            validPaths = [validPaths i];
+        end
+    end 
+
+    minCost = 100000;
+    minCostIndex = -100;
+    for i = 1:length(validPaths)
+        cost = -sum(posMatrix(3,:,validPaths(i)));
+        if (cost < minCost)
+            minCost = cost;
+            minCostIndex = validPaths(i);
+        end
+    end
+    if (minCostIndex)
+        
+    end 
+    % CHECK THE ROAD CONSTRAINTS    
+    control_w = posMatrix(5,2,minCostIndex);
+    control_v = posMatrix(6,2,minCostIndex);
+    
+    y = [control_w control_v];
+end
+
+% function y = dyb(pos, a_rand, w_rand)
+%     x = pos(0) + dt * pos(4) * cos(theta)
+%     y = pos(1) + dt * pos(4) * cos(theta)
+% end
+% function y = dConstr(x, y, theta, v, w, a, H, dt)
+%     for i = 1:H
+%         if (0 ~= x(i+1) - x(i) - dt * v(i) * cos(theta(i)) )
+% 
+%             y = false;
+%             return
+%         end 
+%         if (0 ~= y(i+1) - y(i) - dt * v(i) * sin(theta(i)) )
+% 
+%             y = false;
+%             return
+%         end 
+% 
+%         if (0 ~= theta(i+1) - theta(i) - dt * w(i))
+%             y = false;
+%             return
+%         end
+% 
+%         if (0 ~= v(i+1) - v(i) - dt* a(i))
+%             y = false;
+%             return
+%         end 
+% 
+%         y = true;
+% 
+%     end
+
+% end
