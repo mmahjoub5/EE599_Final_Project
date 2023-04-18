@@ -27,13 +27,13 @@ g = createGrid(grid_min, grid_max, N);
 % data0 = ....
 
 wMax = pi;
-rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -10], [45; 45; pi; 10]);%add velcoity dimension - neg max speed - + max speed
-rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -10], [20; 20; pi; 10]);
+rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -100], [45; 45; pi; 100]);%add velcoity dimension - neg max speed - + max speed
+rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -100], [20; 20; pi; 100]);
 rect3 = shapeDifference(rect1, rect2);
 
 
-rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-10], [105; 105; pi; 10]);
-rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -10], [80; 80; pi; 10]);
+rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-100], [105; 105; pi; 100]);
+rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -100], [80; 80; pi; 100]);
 rect6 = shapeDifference(rect4, rect5);
 
 
@@ -45,7 +45,7 @@ data0 = shapeComplement(data0);
 % time
 t0 = 0;
 tMax = 2;
-dt = 0.05;
+dt = 0.2;
 tau = t0:dt:tMax;
 
 disp('choose max or min')
@@ -56,7 +56,7 @@ dMode = 'min';
 % Define dynamic system
 %dCar = DubinsCar([0, 0, 0], wMax, speed, dMax);
 % create plne 4d 
-dCar = Plane4D([0, 0, 0, 0], wMax, speed, dMax, 4);
+dCar = Plane4D([0, 0, 0, 0], wMax, [-10, 10], [-dMax, dMax]);
 
 % Put grid and dynamic systems into schemeData
 schemeData.grid = g;
@@ -76,14 +76,14 @@ HJIextraArgs.visualize.deleteLastPlot = false; %delete previous plot as you upda
 
 % uncomment if you want to see a 2D slice
 HJIextraArgs.visualize.plotData.plotDims = [1 1 0 0]; %plot x, y
-HJIextraArgs.visualize.plotData.projpt = {pi,'min'}; %project at theta = 0
+HJIextraArgs.visualize.plotData.projpt = [0, 0]; %project at theta = 0
 HJIextraArgs.visualize.viewAngle = [0,90]; % view 2D
 
 %[data, tau, extraOuts] = ...
 % HJIPDE_solve(data0, tau, schemeData, minWith, extraArgs)
 [data, tau2, ~] = ...
     HJIPDE_solve(data0, tau, schemeData, 'zero', HJIextraArgs);
-derivatives = computeGradients(g, data(:,:,:,end));
+derivatives = computeGradients(g, data(:,:,:,:,end));
 safety_controller =  dCar.optCtrl([], [], derivatives, 'max');
 worst_dist =  dCar.optDstb([], [], derivatives, 'min');
 tau = tau2;
