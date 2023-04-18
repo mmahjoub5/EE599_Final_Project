@@ -15,7 +15,7 @@ function [c,ceq] = dynConst(z,xinit,dt)
     end
     % initial state constraints
     ceq = [ceq;z(1)-xinit(1);z(H+2)-xinit(2);z(2*H+3)-xinit(3); z(3*H+4)-xinit(4)];
-    innerLoop = [norm(z(1:H+1)) + norm(z(H+1+1:2*H+2)) - 1];
-    outerLoop = [ 5 - norm(z(1:H+1)) + norm(z(H+1+1:2*H+2))];
-    c= [innerLoop; outerLoop];
+%     innerLoop = [norm(z(1:H+1)) + norm(z(H+1+1:2*H+2)) - 1];
+%     outerLoop = [ 5 - norm(z(1:H+1)) + norm(z(H+1+1:2*H+2))];
+%     c= [innerLoop; outerLoop];
 end

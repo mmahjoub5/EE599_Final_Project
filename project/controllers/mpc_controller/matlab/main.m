@@ -4,7 +4,7 @@ params = get_params();
 
 %%
 
-
+load("saved_data/params.mat");
 %%
 xinit = [-2.5;-1;0;1];
 traj = [xinit];
@@ -67,14 +67,14 @@ ylim([-10, 10])
 u_nom = get_nominal_controller(current_state,params);
 
 %% TODO: Reachability analysis: Please complete the template in the BRT_computation.m file for this section to get the params
-disp('Pre-computing the safety controller with the BRT.........................')
-[params.safety_controller, params.worst_dist, params.data, params.tau, params.g, params.derivatives] = BRT_computation(params); % the BRT gives us the safety controller for free
+% disp('Pre-computing the safety controller with the BRT.........................')
+% [params.safety_controller, params.worst_dist, params.data, params.tau, params.g, params.derivatives] = BRT_computation(params); % the BRT gives us the safety controller for free
 
 
 %% Simulate trajectory with online filtering
 % The robot trajectory initialized
 traj = [params.xinit];
-cont_traj = [];
+cont_traj = [;];
 
 
 while ~stopping_criteria(traj(:,end),params)
@@ -91,10 +91,9 @@ while ~stopping_criteria(traj(:,end),params)
     
     % get the nominal controller: This is given to you 
     u_nom = get_nominal_controller(current_state,params);
-    
     switch params.controller_choice
         case 0
-            cont_traj = [cont_traj;u_nom]; 
+            cont_traj = [cont_traj; u_nom]; 
             chosen_controller = u_nom;
         case 1
             % TODO get the least restrictive safety filtered controller
@@ -112,8 +111,11 @@ while ~stopping_criteria(traj(:,end),params)
     % noisy update to the next state using the chosen control
     next_state = simulate(current_state, chosen_controller, 0, params.dt, params.noise_drift);
     
-    traj = [traj, next_state] % update the trajectory
+    traj = [traj, next_state']; % update the trajectory
     plot_env(traj,params); % plot the env after every step
+    hold on 
+    yline(-40, 'Color', 'r');
+    yline(-20, 'Color', 'r');
     pause(0.05)
 end
 
@@ -121,13 +123,6 @@ end
 plot_controller(params.controller_choice, cont_traj);
 
 %%
-function y = fourDim_dynamics(x,y,theta, v, w, a, dt)
-    x_t = x + dt*v*cos(theta);
-    y_t = y + dt * v * sin(theta);
-    theta_t = theta + dt * w;
-    v_t = v + dt * a;
-    y =[x_t, y_t, theta_t, v_t];
-end
 
 function y = plotTraj(traj)
     figure(1);

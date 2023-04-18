@@ -1,8 +1,8 @@
 function plots = plot_env(traj, params)
 figure(1);
 clf;
-xlim([-10, 10]);
-ylim([-10, 10]);
+xlim([-100, 100]);
+ylim([-100, 100]);
 set(gca,'XTickLabel',[]);
 set(gca,'YTickLabel',[]);
 x0=10;
@@ -46,5 +46,6 @@ if ~isempty(traj)
 end
 axis square;
 box on
+grid on
 plots = 0;
 
