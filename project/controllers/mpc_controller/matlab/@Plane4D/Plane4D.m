@@ -58,4 +58,5 @@ classdef Plane4D < DynSys
       obj.nd = 2;
     end
   end % end methods
+  
 end % end classdef
