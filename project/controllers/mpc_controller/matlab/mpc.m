@@ -27,6 +27,7 @@ function X = mpc(H, goalX, goalY, dt, wMax, xinit)
     UB = [100*ones(H+1, 1);   100*ones(H+1, 1); pi*ones(H+1, 1); 5*ones(H+1,1); wMax*ones(H, 1); 4 *ones(H,1)];
     
     %% Perform the optimization and solve the MPC problem
+    
     options = optimoptions('fmincon','Display','notify', 'Algorithm', 'sqp', 'MaxFunctionEvaluations', 300000,MaxIterations=1000000);
     nonlcon = @(z)dynConst(z,xinit,dt);
     X = fmincon(@(x) myfun(x, H, goalX, goalY), x0,[],[], [], [], LB(:, 1), UB(:, 1), nonlcon, options);

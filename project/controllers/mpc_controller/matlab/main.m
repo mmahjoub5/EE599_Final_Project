@@ -3,26 +3,44 @@ clear all; close all; clc;
 params = get_params();
 
 %%
+goalX = 0;
+goalY = 22;
+%%
 
 load("saved_data/params.mat");
+
+%[params.precom_optDist_g, params.precom_optDist_values] =               get_optDst_precom("optDst_0_1.mat");
 %%
-xinit = [-2.5;-1;0;1];
+xinit = [-35;2;0;1]
 traj = [xinit];
 % y = RMPC(10, 100000,xinit);
-
+% boundary = [1,2.5];
+% boundary2 = [-1,-2,5];
+% goalX = boundary(1) + (boundary(2) - boundary(1)) * rand(1,1);
+% goalY = boundary(1) + (boundary2(2) - boundary2(1)) * rand(1,1);
+goalX 
+goalY
+centerX = [0 0];
+centerY = [0 0];
+outerR = 40;
+innerR = 20;
+goalX = 25;
+goalY = 25;
 while true
-    y = RMPC(50, 2000, xinit)
-    if (xinit(1) - params.goalX)^2 < 0.01 && (xinit(2) - params.goalY)^2 < 0.01
-        break
+    y = RMPC(75, 2000, xinit, goalX, goalY, centerX, centerY, innerR, outerR);
+    if (xinit(1) - goalX)^2 < 0.1 && (xinit(2) - goalY)^2 < 0.1
+        break;
     end
    
     if y ~= [-999999]
-        result = fourDim_dynamics(xinit(1), xinit(2), xinit(3), xinit(4),y(1),y(2), 0.01);
+        result = fourDim_dynamics(xinit(1), xinit(2), xinit(3), xinit(4),y(1),y(2), 0.01,[0 0]);
         traj = [traj, result'];
         xinit = result'
-        plotTraj(traj)
+        plotTraj(traj, centerX, centerY, innerR, outerR);
     else
-        break
+        y
+        plotTraj(traj, centerX, centerY, innerR, outerR);
+%         break
     end
 end
 
@@ -67,8 +85,8 @@ ylim([-10, 10])
 u_nom = get_nominal_controller(current_state,params);
 
 %% TODO: Reachability analysis: Please complete the template in the BRT_computation.m file for this section to get the params
-% disp('Pre-computing the safety controller with the BRT.........................')
-% [params.safety_controller, params.worst_dist, params.data, params.tau, params.g, params.derivatives] = BRT_computation(params); % the BRT gives us the safety controller for free
+disp('Pre-computing the safety controller with the BRT.........................')
+[params.safety_controller, params.worst_dist, params.data, params.tau, params.g, params.derivatives] = BRT_computation(params); % the BRT gives us the safety controller for free
 
 
 %% Simulate trajectory with online filtering
@@ -124,10 +142,11 @@ plot_controller(params.controller_choice, cont_traj);
 
 %%
 
-function y = plotTraj(traj)
+function y = plotTraj(traj, centerX, centerY, innerR, outerR)
     figure(1);
     plot(traj(1, :), traj(2, :), 'color', 'b', 'LineWidth', 2);
     hold on;
+    viscircles([centerX; centerY], [innerR,outerR], 'Color', 'r')
     xline(1)
     xline(5)
     yline(1)
@@ -137,7 +156,8 @@ function y = plotTraj(traj)
     yline(-1)
     yline(-5)
     hold off
-    xlim([-10, 10]);
-    ylim([-10, 10])
+    xlim([-50, 50]);
+    ylim([-50, 50])
+    grid on
 
 end
