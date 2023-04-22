@@ -20,7 +20,7 @@ height2 = params.obsheight2;
 grid_min = [-110; -110; - 2 * pi; -50]; % Lower corner of computation domain
 grid_max = [110; 110; 2 * pi; 50];    % Upper corner of computation domain
 N = [50; 50; 50; 50];         % Number of grid points per dimension
-g = createGrid(grid_min, grid_max, N, pdDims=[3]);
+g = createGrid(grid_min, grid_max, N, 3);
 
 %% TODO
 % Define the failure set: data0
