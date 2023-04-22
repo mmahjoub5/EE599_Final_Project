@@ -16,24 +16,24 @@ height2 = params.obsheight2;
 % Define the grid for the computation: g
 % g =...
 
-%add 4th dimension for these 
-grid_min = [-110; -110; -110; -110]; % Lower corner of computation domain
-grid_max = [110; 110; 110; 110];    % Upper corner of computation domain
+%add 4th dimension for these %
+grid_min = [-110; -110; - 2 * pi; -50]; % Lower corner of computation domain
+grid_max = [110; 110; 2 * pi; 50];    % Upper corner of computation domain
 N = [50; 50; 50; 50];         % Number of grid points per dimension
-g = createGrid(grid_min, grid_max, N);
+g = createGrid(grid_min, grid_max, N, pdDims=[3]);
 
 %% TODO
 % Define the failure set: data0
 % data0 = ....
 
 wMax = pi;
-rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -10], [45; 45; pi; 10]);%add velcoity dimension - neg max speed - + max speed
-rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -10], [20; 20; pi; 10]);
+rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -40], [45; 45; pi; 40]);%add velcoity dimension - neg max speed - + max speed
+rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -40], [20; 20; pi; 40]);
 rect3 = shapeDifference(rect1, rect2);
 
 
-rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-10], [105; 105; pi; 10]);
-rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -10], [80; 80; pi; 10]);
+rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-40], [105; 105; pi; 40]);
+rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -40], [80; 80; pi; 40]);
 rect6 = shapeDifference(rect4, rect5);
 
 
@@ -86,6 +86,6 @@ HJIextraArgs.visualize.viewAngle = [0,90]; % view 2D
 %%
 derivatives = computeGradients(g, data(:,:,:,:,end));
 safety_controller =  dCar.optCtrl([], [], derivatives, 'max');
-worst_dist =  dCar.optDstb([], [], derivatives, 'min');
+worst_dist =  dCar.optDstb([], [], derivatives, 'min'); % save this as well and then load it again 
 tau = tau2;
 
