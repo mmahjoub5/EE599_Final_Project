@@ -4,7 +4,9 @@ params = get_params();
 
 %%
 
-load("saved_data/params.mat");
+load("saved_data/params.mat")
+%%
+params = p.params
 %%
 xinit = [-33;0;0;1];
 traj = [xinit];
