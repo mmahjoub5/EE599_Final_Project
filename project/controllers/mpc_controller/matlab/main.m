@@ -32,14 +32,16 @@ end
 xinit = [0;2;0;1];
 traj = [xinit];
 while true
+    %y = RMPC(50, 2000, xinit);
     if (xinit(1) - params.goalX)^2 < 0.1 && (xinit(2) - params.goalY)^2 < 0.1
         break
     end
-    X = mpc(params.H, params.goalX, params.goalY, params.dt, params.wMax, xinit, params.speed);
+    X = mpc(params.H, params.goalX, params.goalY, params.dt, params.wMax, xinit);
     w = X(4*(params.H+1)+2);
     a = X(5*(params.H+1)+1);
-    result = fourDim_dynamics(xinit(1), xinit(2), xinit(3), xinit(4),w,a, params.dt);
-    traj = [traj, result'];
+    %result = fourDim_dynamics(xinit(1), xinit(2), xinit(3), xinit(4),w,a, params.dt);
+    result = fourDim_dynamics(xinit(1), xinit(2), xinit(3), xinit(4),y(1),y(2), 0.01, [0, 0]);
+    traj = [traj, result];
     xinit = result
 end 
 

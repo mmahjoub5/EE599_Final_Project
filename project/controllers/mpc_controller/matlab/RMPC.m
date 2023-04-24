@@ -50,7 +50,7 @@ function y = RMPC(H, numberOfRandomSamples, xinit, goalX, goalY,  centerX, cente
         %cost = -sum(posMatrix(4,:,validPaths(i)));
         %cost = sum((posMatrix(1,:,validPaths(i)) - goalX).^2) + sum((posMatrix(2,:,validPaths(i)) - goalY).^2); %- sum(abs(posMatrix(4,:,validPaths(i)))); % sum(abs((posMatrix(1, :, i) - centerX(1)).^2 + (posMatrix(2, :, i) - centerY(1)).^2 )) ^2
         % (x_n - x_r)^2 * Q_n + sum(x_k - x_r)^2 + u_k^2 * R)   
-        cost =  sum( - 2* posMatrix(4,:,validPaths(i)) + 0.5 * abs((posMatrix(1, :, i) - centerX(1)).^2 + (posMatrix(2, :, i) - centerY(1)).^2 -  30^2));
+        cost =  sum( - 2* posMatrix(4,:,validPaths(i)) + 0.75 * abs((posMatrix(1, :, i) - centerX(1)).^2 + (posMatrix(2, :, i) - centerY(1)).^2 -  30^2));
         if (cost < minCost)
             minCost = cost;
             minCostIndex = validPaths(i);

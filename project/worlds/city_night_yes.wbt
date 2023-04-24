@@ -559,7 +559,7 @@ CurvedRoadSegment {
 DEF car BmwX5 {
   translation -48.1024 44.2733 0.0443397
   rotation -0.00213576049664043 -0.011873002760896274 0.9999272325187172 3.12813
-  controller "mpc_controller"
+  controller "matlab_controller"
   supervisor TRUE
   frontSpotLights TRUE
   sensorsSlotTop [
