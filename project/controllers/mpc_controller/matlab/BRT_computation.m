@@ -17,9 +17,9 @@ height2 = params.obsheight2;
 % g =...
 
 %add 4th dimension for these %
-grid_min = [-110; -110; - 2 * pi; -50]; % Lower corner of computation domain
-grid_max = [110; 110; 2 * pi; 50];    % Upper corner of computation domain
-N = [50; 50; 50; 50];         % Number of grid points per dimension
+grid_min = [-120; -120; - 2 * pi; -50]; % Lower corner of computation domain
+grid_max = [120; 120; 2 * pi; 50];    % Upper corner of computation domain
+N = [75; 75; 75; 75];         % Number of grid points per dimension
 g = createGrid(grid_min, grid_max, N, 3);
 
 %% TODO
@@ -27,13 +27,13 @@ g = createGrid(grid_min, grid_max, N, 3);
 % data0 = ....
 
 wMax = pi;
-rect1 = shapeRectangleByCorners(g, [-105; -105; -pi; -40], [45; 45; pi; 40]);%add velcoity dimension - neg max speed - + max speed
-rect2 = shapeRectangleByCorners(g, [-80; -80; -pi; -40], [20; 20; pi; 40]);
+rect1 = shapeRectangleByCorners(g, [-110; -110; -pi; -40], [54.5; 54.5; pi; 40]);%add velcoity dimension - neg max speed - + max speed
+rect2 = shapeRectangleByCorners(g, [-92; -92; -pi; -40], [33; 33; pi; 40]);
 rect3 = shapeDifference(rect1, rect2);
 
 
-rect4 = shapeRectangleByCorners(g, [-50; -50; -pi;-40], [105; 105; pi; 40]);
-rect5 = shapeRectangleByCorners(g, [-22; -22; -pi; -40], [80; 80; pi; 40]);
+rect4 = shapeRectangleByCorners(g, [-54.5; -54.5; -pi;-40], [110; 110; pi; 40]);
+rect5 = shapeRectangleByCorners(g, [-33; -33; -pi; -40], [92; 92; pi; 40]);
 rect6 = shapeDifference(rect4, rect5);
 
 

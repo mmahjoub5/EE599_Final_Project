@@ -1,8 +1,8 @@
 function plots = plot_env(traj, params)
 figure(1);
 clf;
-xlim([-100, 100]);
-ylim([-100, 100]);
+xlim([-110, 110]);
+ylim([-110, 110]);
 set(gca,'XTickLabel',[]);
 set(gca,'YTickLabel',[]);
 x0=10;
@@ -42,7 +42,35 @@ if ~isempty(traj)
     xinit = traj(:,1);
     % Create initial state
     viscircles(xinit(1:2,:)', [0.1], 'color', 'b');
+%     xline(-110);
+%     xline(-92);
+%     xline(-54.5);
+%     xline(-33);
+%     xline(33);
+%     xline(54.5);
+%     xline(92);
+%     xline(110);
+%     
+%     yline(-110);
+%     yline(-92);
+%     yline(-54.5);
+%     yline(-33);
+%     yline(33);
+%     yline(54.5);
+%     yline(92);
+%     yline(110);
+%     
+    rectangle('Position',[-54.5 -54.5 164.5 164.5],'Curvature',0.1);
+    rectangle('Position',[-33 -33 125 125],'Curvature',0.1);
+
+    rectangle('Position',[-110 -110 164.5 164.5],'Curvature',0.1);
+    rectangle('Position',[-92 -92 125 125],'Curvature',0.1);
+
+    
+    
+    hold on;
     plot(traj(1, :), traj(2, :), 'color', 'b', 'LineWidth', 2);
+    hold off;
 end
 axis square;
 box on

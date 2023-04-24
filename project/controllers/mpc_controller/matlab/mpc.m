@@ -23,8 +23,8 @@ function X = mpc(H, goalX, goalY, dt, wMax, xinit)
    
     %% Setup control bounds
     % Lower bounds
-    LB = [-100*ones(H+1, 1); -100*ones(H+1, 1);-pi*ones(H+1, 1);       -5*ones(H+1,1); -wMax*ones(H, 1); -4 *ones(H,1)];
-    UB = [100*ones(H+1, 1);   100*ones(H+1, 1); pi*ones(H+1, 1); 5*ones(H+1,1); wMax*ones(H, 1); 4 *ones(H,1)];
+    LB = [-150*ones(H+1, 1); -150*ones(H+1, 1);-pi*ones(H+1, 1);       -50*ones(H+1,1); -wMax*ones(H, 1); -10 *ones(H,1)];
+    UB = [150*ones(H+1, 1);   150*ones(H+1, 1); pi*ones(H+1, 1); 50*ones(H+1,1); wMax*ones(H, 1);10*ones(H,1)];
     
     %% Perform the optimization and solve the MPC problem
     
@@ -38,6 +38,6 @@ end
 %% Setup cost function
 function f = myfun(x, H, goalX, goalY)
     % Penalize the distance from the goal state
-    %f = sum((x(1:H+1) - goalX).^2) + sum((x(H+2:2*H+2) - goalY).^2);
-    f =  -norm((x(3*(H+1)+1:4*(H+1) +1)));
+    f = sum((x(1:H+1) - goalX).^2) + sum((x(H+2:2*H+2) - goalY).^2);
+    %f =  -norm((x(3*(H+1)+1:4*(H+1) +1)));
 end

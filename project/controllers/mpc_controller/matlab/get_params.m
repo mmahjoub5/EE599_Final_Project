@@ -11,8 +11,8 @@ function params = get_params()
 
     % Setup environment parameters
     % goal params  
-    params.goalX = 40;
-    params.goalY = 40;
+    params.goalX = 100;
+    params.goalY = 100;
     params.goalR = 2;
 
     % obstacle 1 params
